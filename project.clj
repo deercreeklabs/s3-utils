@@ -1,4 +1,4 @@
-(defproject deercreeklabs/s3-utils "0.1.1-SNAPSHOT"
+(defproject deercreeklabs/s3-utils "0.1.1"
   :description "Utilities for working with S3"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
