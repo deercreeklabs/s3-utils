@@ -11,7 +11,7 @@
 
 (def Nil (s/eq nil))
 (def SuccessCallback (s/=> Nil s/Any))
-(def FailureCallback (s/=> Nil Exception))
+(def FailureCallback (s/=> Nil #?(:clj Exception :cljs js/Error)))
 
 
 (s/defn s3-get :- Nil

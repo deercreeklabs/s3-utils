@@ -22,3 +22,8 @@ tramp
 
 # Mac stuff
 .DS_Store
+
+# JS stuff
+/node_modules
+package.json
+package-lock.json
