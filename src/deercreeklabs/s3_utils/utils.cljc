@@ -5,7 +5,9 @@
    [deercreeklabs.log-utils :as lu :refer [debugs]]
    [schema.core :as s]
    [taoensso.timbre :as timbre :refer [debugf errorf infof]])
-  #?(:clj
+  #?(:cljs
+     (:require-macros deercreeklabs.s3-utils.utils)
+     :clj
      (:import
       (com.amazonaws.event ProgressEvent
                            ProgressEventType
@@ -19,6 +21,7 @@
                FileInputStream
                InputStream))))
 
+
 (defmacro sym-map
   "Builds a map from symbols.
    Symbol names are turned into keywords and become the map's keys.
@@ -28,6 +31,11 @@
     (sym-map a b))  =>  {:a 1 :b 2}"
   [& syms]
   (zipmap (map keyword syms) syms))
+
+(s/defn node? :- s/Bool
+  []
+  #?(:clj false
+     :cljs (boolean (= "nodejs" cljs.core/*target*))))
 
 (defn make-success-callback [ret-ch]
   (fn [result]
@@ -44,12 +52,15 @@
    (make-failure-callback ret-ch)])
 
 (defprotocol IS3Client
-  (s3-get [this bucket k success-cb failure-cb])
-  (s3-put [this bucket k data success-cb failure-cb])
+  (get-bytes [this bucket k success-cb failure-cb])
+  (<get-bytes [this bucket k])
+  (put-bytes [this bucket k bs success-cb failure-cb])
+  (<put-bytes [this bucket k bs])
   (stop [this]))
 
+
 #?(:clj
-   (defn s3-get-clj
+   (defn get-bytes-clj
      [transfer-mgr client-obj bucket k success-cb failure-cb]
      (let [^File dl-file (doto (File/createTempFile "s3dl" nil)
                            (.deleteOnExit))
@@ -79,11 +90,11 @@
        nil)))
 
 #?(:clj
-   (defn s3-put-clj
-     [transfer-mgr client-obj bucket k data success-cb failure-cb]
-     (let [is (io/input-stream data)
+   (defn put-bytes-clj
+     [transfer-mgr client-obj bucket k bs success-cb failure-cb]
+     (let [is (io/input-stream bs)
            metadata (doto (ObjectMetadata.)
-                      (.setContentLength (count data))
+                      (.setContentLength (count bs))
                       (.setContentType "application/octet-stream"))
            ^Upload upload (.upload ^TransferManager transfer-mgr
                                    bucket k is metadata)
@@ -102,7 +113,7 @@
        nil)))
 
 #?(:cljs
-   (defn s3-get-cljs
+   (defn get-bytes-node
      [s3-obj client-obj bucket k success-cb failure-cb]
      (let [params #js {"Bucket" bucket
                        "Key" k}
@@ -114,9 +125,9 @@
        (.getObject s3-obj params cb))))
 
 #?(:cljs
-   (defn s3-put-cljs
-     [s3-obj client-obj bucket k data success-cb failure-cb]
-     (let [buffer (js/Buffer.from (.-buffer data))
+   (defn put-bytes-node
+     [s3-obj client-obj bucket k bs success-cb failure-cb]
+     (let [buffer (js/Buffer.from (.-buffer bs))
            params #js {"Body" buffer
                        "Bucket" bucket
                        "Key" k}
@@ -127,40 +138,61 @@
            x (.-putObject s3-obj)]
        (.putObject s3-obj params cb))))
 
+(defn throw-platform-exception []
+  (throw (ex-info "Only JVM and nodejs platforms are currently supported"
+                  {})))
 
 (defrecord S3Client [s3-obj]
   IS3Client
-  (s3-get [this bucket k success-cb failure-cb]
+  (get-bytes [this bucket k success-cb failure-cb]
     (try
       #?(:clj
-         (s3-get-clj s3-obj this bucket k success-cb failure-cb)
+         (get-bytes-clj s3-obj this bucket k success-cb failure-cb)
          :cljs
-         (s3-get-cljs s3-obj this bucket k success-cb failure-cb))
+         (if (node?)
+           (get-bytes-node s3-obj this bucket k success-cb failure-cb)
+           (throw-platform-exception)))
       (catch #?(:clj Exception :cljs js/Error) e
-        (failure-cb (ex-info (str "Exception in s3-get: \n"
+        (failure-cb (ex-info (str "Exception in get-bytes: \n"
                                   (lu/get-exception-msg-and-stacktrace e))
                              {:exception e})))))
 
-  (s3-put [this bucket k data success-cb failure-cb]
+  (<get-bytes [this bucket k]
+    (let [ret-ch (ca/chan)
+          [success-cb failure-cb] (make-callbacks ret-ch)]
+      (get-bytes this bucket k success-cb failure-cb)
+      ret-ch))
+
+  (put-bytes [this bucket k bs success-cb failure-cb]
     (try
       #?(:clj
-         (s3-put-clj s3-obj this bucket k data success-cb failure-cb)
+         (put-bytes-clj s3-obj this bucket k bs success-cb failure-cb)
          :cljs
-         (s3-put-cljs s3-obj this bucket k data success-cb failure-cb))
+         (if (node?)
+           (put-bytes-node s3-obj this bucket k bs success-cb failure-cb)
+           (throw-platform-exception)))
       (catch #?(:clj Exception :cljs js/Error) e
-        (failure-cb (ex-info (str "Exception in s3-put: "
+        (failure-cb (ex-info (str "Exception in put-bytes: "
                                   (lu/get-exception-msg-and-stacktrace e))
                              {:exception e})))))
 
-  (stop [this]
+  (<put-bytes [this bucket k bs]
+    (let [ret-ch (ca/chan)
+          [success-cb failure-cb] (make-callbacks ret-ch)]
+      (put-bytes this bucket k bs success-cb failure-cb)
+      ret-ch))
+
+  (stop  [this]
     #?(:clj
        (.shutdownNow ^TransferManager s3-obj))))
 
 
-(defn make-s3-client []
-  (->S3Client #?(:clj (TransferManagerBuilder/defaultTransferManager)
-                 :cljs (let [s3 (js/require "aws-sdk/clients/s3")]
-                         (s3.)))))
+(s/defn make-s3-client :- (s/protocol IS3Client)
+  []
+  (let [s3-obj #?(:clj (TransferManagerBuilder/defaultTransferManager)
+                  :cljs (let [s3 (js/require "aws-sdk/clients/s3")]
+                          (s3.)))]
+    (->S3Client s3-obj)))
 
 (defn configure-logging
   ([] (configure-logging :debug))

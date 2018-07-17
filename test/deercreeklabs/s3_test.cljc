@@ -15,7 +15,7 @@
 ;; Use this instead of fixtures, which are hard to make work w/ async testing.
 (s/set-fn-validation! true)
 
-(deftest test-round-trip
+(deftest test-round-trip-bytes
   (au/test-async
    10000
    (au/go
@@ -23,8 +23,8 @@
            bucket "deercreeklabs-testing"
            k "test.txt"
            data (ba/utf8->byte-array "Hello world")
-           ret (au/<? (s3/<s3-put client bucket k data))
+           ret (au/<? (s3/<put-bytes client bucket k data))
            _ (is (= true ret))
-           ret (au/<? (s3/<s3-get client bucket k))]
+           ret (au/<? (s3/<get-bytes client bucket k))]
        (s3/stop client)
        (is (ba/equivalent-byte-arrays? data ret))))))

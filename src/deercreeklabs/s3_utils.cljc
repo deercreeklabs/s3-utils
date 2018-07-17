@@ -10,50 +10,45 @@
    [taoensso.timbre :as timbre :refer [debugf errorf infof]]))
 
 (def Nil (s/eq nil))
+(def S3Client (s/protocol u/IS3Client))
 (def SuccessCallback (s/=> Nil s/Any))
 (def FailureCallback (s/=> Nil #?(:clj Exception :cljs js/Error)))
 
 
-(s/defn s3-get :- Nil
-  [s3-client :- (s/protocol u/IS3Client)
+(s/defn get-bytes :- Nil
+  [s3-client :- S3Client
    bucket :- s/Str
    k :- s/Str
    success-cb :- SuccessCallback
    failure-cb :- FailureCallback]
-  (u/s3-get s3-client bucket k success-cb FailureCallback))
+  (u/get-bytes s3-client bucket k success-cb FailureCallback))
 
-(s/defn <s3-get :- au/Channel
-  [s3-client :- (s/protocol u/IS3Client)
+(s/defn <get-bytes :- au/Channel
+  [s3-client :- S3Client
    bucket :- s/Str
    k :- s/Str]
-  (let [ret-ch (ca/chan)
-        [success-cb failure-cb] (u/make-callbacks ret-ch)]
-    (u/s3-get s3-client bucket k success-cb failure-cb)
-    ret-ch))
+  (u/<get-bytes s3-client bucket k))
 
-(s/defn s3-put :- Nil
-  [s3-client :- (s/protocol u/IS3Client)
+(s/defn put-bytes :- Nil
+  [s3-client :- S3Client
    bucket :- s/Str
    k :- s/Str
-   data :- ba/ByteArray
+   bs :- ba/ByteArray
    success-cb :- SuccessCallback
    failure-cb :- FailureCallback]
-  (u/s3-put s3-client bucket k data success-cb failure-cb))
+  (u/put-bytes s3-client bucket k bs success-cb failure-cb))
 
-(s/defn <s3-put :- au/Channel
-  [s3-client :- (s/protocol u/IS3Client)
+(s/defn <put-bytes :- au/Channel
+  [s3-client :- S3Client
    bucket :- s/Str
    k :- s/Str
-   data :- ba/ByteArray]
-  (let [ret-ch (ca/chan)
-        [success-cb failure-cb] (u/make-callbacks ret-ch)]
-    (u/s3-put s3-client bucket k data success-cb failure-cb)
-    ret-ch))
+   bs :- ba/ByteArray]
+  (u/<put-bytes s3-client bucket k bs))
 
 (s/defn stop :- Nil
-  [s3-client :- (s/protocol u/IS3Client)]
+  [s3-client :- S3Client]
   (u/stop s3-client))
 
-(s/defn make-s3-client :- (s/protocol u/IS3Client)
+(s/defn make-s3-client :- S3Client
   []
   (u/make-s3-client))
