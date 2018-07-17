@@ -1,7 +1,7 @@
 (def compiler-defaults
   {:npm-deps {:aws-sdk "2.269.1"
-              :source-map-support "0.5.6"
-              :pako "1.0.6"}
+              :pako "1.0.6"
+              :source-map-support "0.5.6"}
    :install-deps true
    :parallel-build true
    :static-fns true
@@ -78,13 +78,17 @@
      [org.clojure/tools.namespace "0.2.11"]]}}
 
   :dependencies
-  [[com.amazonaws/aws-java-sdk-s3 "1.11.361"
-    :exclusions [com.fasterxml.jackson.core/jackson-core joda-time]]
+  [[com.amazonaws/aws-java-sdk-s3 "1.11.367"
+    :exclusions [com.fasterxml.jackson.core/jackson-core
+                 com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
+                 joda-time]]
    [com.taoensso/timbre "4.10.0" :exclusions [org.clojure/tools.reader]]
    [commons-logging/commons-logging "1.2"]
    [deercreeklabs/async-utils "0.1.12"]
-   [deercreeklabs/baracus "0.1.10"]
+   [deercreeklabs/baracus "0.1.11"]
+   [deercreeklabs/lancaster "0.4.4"]
    [deercreeklabs/log-utils "0.1.8"]
+   [deercreeklabs/stockroom "0.1.15"]
    [org.clojure/core.async "0.4.474"]
    [org.clojure/clojure "1.9.0"]
    [org.clojure/clojurescript "1.10.339"]
