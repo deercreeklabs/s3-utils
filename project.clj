@@ -44,7 +44,7 @@
              :compiler compiler}
       node-test? (assoc :notify-command ["node" output-to]))))
 
-(defproject deercreeklabs/s3-utils "0.3.0"
+(defproject deercreeklabs/s3-utils "0.3.1-SNAPSHOT"
   :description "Utilities for working with S3"
   :url "https://github.com/deercreeklabs/s3-utils"
   :license {:name "Apache License, Version 2.0"
