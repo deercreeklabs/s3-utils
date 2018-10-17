@@ -49,6 +49,6 @@
   [s3-client :- S3Client]
   (u/stop s3-client))
 
-(s/defn make-s3-client :- S3Client
+(s/defn s3-client :- S3Client
   []
-  (u/make-s3-client))
+  (u/s3-client))

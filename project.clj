@@ -44,7 +44,7 @@
              :compiler compiler}
       node-test? (assoc :notify-command ["node" output-to]))))
 
-(defproject deercreeklabs/s3-utils "0.2.1-SNAPSHOT"
+(defproject deercreeklabs/s3-utils "0.3.0-SNAPSHOT"
   :description "Utilities for working with S3"
   :url "https://github.com/deercreeklabs/s3-utils"
   :license {:name "Apache License, Version 2.0"
@@ -64,7 +64,7 @@
       :exclusions [org.apache.httpcomponents/httpclient
                    com.amazonaws/aws-java-sdk-s3 commons-logging commons-codec]]
      [lein-cljsbuild "1.1.7" :exclusions [org.clojure/clojure]]
-     [lein-cloverage "1.0.11" :exclusions [fipp org.clojure/clojure
+     [lein-cloverage "1.0.13" :exclusions [fipp org.clojure/clojure
                                            org.clojure/tools.reader]]
      [lein-doo "0.1.10"
       :exclusions [org.clojure/clojure org.clojure/clojurescript]]
@@ -78,15 +78,15 @@
      [org.clojure/tools.namespace "0.2.11"]]}}
 
   :dependencies
-  [[com.amazonaws/aws-java-sdk-s3 "1.11.369"
+  [[com.amazonaws/aws-java-sdk-s3 "1.11.430"
     :exclusions [com.fasterxml.jackson.core/jackson-core
                  com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
                  joda-time]]
    [com.taoensso/timbre "4.10.0" :exclusions [org.clojure/tools.reader]]
    [commons-logging/commons-logging "1.2"]
    [deercreeklabs/async-utils "0.1.12"]
-   [deercreeklabs/baracus "0.1.11"]
-   [deercreeklabs/log-utils "0.1.8"]
+   [deercreeklabs/baracus "0.1.12"]
+   [deercreeklabs/log-utils "0.2.0"]
    [org.clojure/core.async "0.4.474"]
    [org.clojure/clojure "1.9.0"]
    [org.clojure/clojurescript "1.10.339"]

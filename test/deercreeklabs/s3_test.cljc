@@ -19,7 +19,7 @@
   (au/test-async
    10000
    (au/go
-     (let [client (s3/make-s3-client)
+     (let [client (s3/s3-client)
            bucket "deercreeklabs-testing"
            k "test.txt"
            data (ba/utf8->byte-array "Hello world")

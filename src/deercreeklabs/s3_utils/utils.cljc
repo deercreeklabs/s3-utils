@@ -154,7 +154,7 @@
            (throw-platform-exception)))
       (catch #?(:clj Exception :cljs js/Error) e
         (failure-cb (ex-info (str "Exception in get-bytes: \n"
-                                  (lu/get-exception-msg-and-stacktrace e))
+                                  (lu/ex-msg-and-stacktrace e))
                              {:exception e})))))
 
   (<get-bytes [this bucket k]
@@ -173,7 +173,7 @@
            (throw-platform-exception)))
       (catch #?(:clj Exception :cljs js/Error) e
         (failure-cb (ex-info (str "Exception in put-bytes: "
-                                  (lu/get-exception-msg-and-stacktrace e))
+                                  (lu/ex-msg-and-stacktrace e))
                              {:exception e})))))
 
   (<put-bytes [this bucket k bs]
@@ -187,7 +187,7 @@
        (.shutdownNow ^TransferManager s3-obj))))
 
 
-(s/defn make-s3-client :- (s/protocol IS3Client)
+(s/defn s3-client :- (s/protocol IS3Client)
   []
   (let [s3-obj #?(:clj (TransferManagerBuilder/defaultTransferManager)
                   :cljs (let [s3 (js/require "aws-sdk/clients/s3")]
