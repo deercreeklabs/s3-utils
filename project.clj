@@ -66,7 +66,7 @@
      [lein-cljsbuild "1.1.7" :exclusions [org.clojure/clojure]]
      [lein-cloverage "1.0.13" :exclusions [fipp org.clojure/clojure
                                            org.clojure/tools.reader]]
-     [lein-doo "0.1.10"
+     [lein-doo "0.1.11"
       :exclusions [org.clojure/clojure org.clojure/clojurescript]]
      ;; Because of confusion with a defunct project also called
      ;; lein-release, we exclude lein-release from lein-ancient.
@@ -74,22 +74,22 @@
       :exclusions [org.clojure/clojure]]
      [s3-wagon-private "1.3.2" :exclusions [commons-logging]]]
     :dependencies
-    [[doo "0.1.10"]
+    [[doo "0.1.11"]
      [org.clojure/tools.namespace "0.2.11"]]}}
 
   :dependencies
-  [[com.amazonaws/aws-java-sdk-s3 "1.11.430"
+  [[com.amazonaws/aws-java-sdk-s3 "1.11.461"
     :exclusions [com.fasterxml.jackson.core/jackson-core
                  com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
                  joda-time]]
    [com.taoensso/timbre "4.10.0" :exclusions [org.clojure/tools.reader]]
    [commons-logging/commons-logging "1.2"]
-   [deercreeklabs/async-utils "0.1.12"]
-   [deercreeklabs/baracus "0.1.12"]
-   [deercreeklabs/log-utils "0.2.0"]
-   [org.clojure/core.async "0.4.474"]
+   [deercreeklabs/async-utils "0.1.13"]
+   [deercreeklabs/baracus "0.1.13"]
+   [deercreeklabs/log-utils "0.2.2"]
+   [org.clojure/core.async "0.4.490"]
    [org.clojure/clojure "1.9.0"]
-   [org.clojure/clojurescript "1.10.339"]
+   [org.clojure/clojurescript "1.10.439"]
    [prismatic/schema "1.1.9"]]
 
   :test-selectors {:default (complement :slow)
