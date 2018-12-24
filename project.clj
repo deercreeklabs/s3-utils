@@ -78,7 +78,7 @@
      [org.clojure/tools.namespace "0.2.11"]]}}
 
   :dependencies
-  [[com.amazonaws/aws-java-sdk-s3 "1.11.472"
+  [[com.amazonaws/aws-java-sdk-s3 "1.11.475"
     :exclusions [com.fasterxml.jackson.core/jackson-core
                  com.fasterxml.jackson.dataformat/jackson-dataformat-cbor
                  joda-time]]
@@ -86,7 +86,7 @@
    [commons-logging/commons-logging "1.2"]
    [deercreeklabs/async-utils "0.1.14"]
    [deercreeklabs/baracus "0.1.14"]
-   [deercreeklabs/log-utils "0.2.3"]
+   [deercreeklabs/log-utils "0.2.4"]
    [org.clojure/core.async "0.4.490"]
    [org.clojure/clojure "1.10.0"]
    [org.clojure/clojurescript "1.10.439"]
